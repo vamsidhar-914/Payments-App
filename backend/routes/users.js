@@ -151,4 +151,11 @@ router.get("/bulk", async (req, res) => {
   });
 });
 
+// get single user information
+router.get("/get/:id", async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const { password, ...rest } = user._doc;
+  res.status(200).json(rest);
+});
+
 module.exports = router;

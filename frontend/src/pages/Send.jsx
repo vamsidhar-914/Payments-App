@@ -1,29 +1,36 @@
-import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { ArrowBigLeft } from "lucide";
 import { Navbar } from "../components/Navbar";
+import Context from "../context/AuthProvider";
+import { Modal } from "../components/Modal";
+import { TiTick } from "react-icons/ti";
 
 export function Send() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const name = searchParams.get("name");
   const [amount, setAmount] = useState(0);
+  const { auth } = useContext(Context);
+  const [isOpen, setisOpen] = useState(false);
+  const data = JSON.parse(localStorage.getItem("token"));
 
   const handleClick = () => {
     axios.post(
-      "http://localhost:7000/api/v1/account/transfer",
+      "/api/v1/account/transfer",
       {
         to: id,
         amount,
       },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${data.token}`,
         },
       }
     );
     // do something after transfer successfull
+    setisOpen(true);
   };
 
   return (
@@ -74,6 +81,32 @@ export function Send() {
           </div>
         </div>
       </div>
+
+      <Modal
+        open={isOpen}
+        onClose={() => setisOpen(false)}
+      >
+        <div className='text-center w-56'>
+          <TiTick
+            size={56}
+            className='mx-auto text-green-500'
+          />
+          <div className='mx-auto my-4 w-48'>
+            <h3 className='text-lg font-black text-gray-800'>
+              payment transfer successfull
+            </h3>
+            <p className='text-sm text-gray-500'>
+              Head back to{" "}
+              <Link
+                to='/dashboard'
+                className='pointer underline cursor-pointer'
+              >
+                Dashboard
+              </Link>
+            </p>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

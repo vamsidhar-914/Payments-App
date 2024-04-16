@@ -4,32 +4,38 @@ import { Signin } from "./pages/Signin";
 import { Dashboard } from "./pages/Dashboard";
 import { Send } from "./pages/Send";
 import { Home } from "./pages/Home";
-import { Navbar } from "./components/Navbar";
-
+import { useContext } from "react";
+import Context from "./context/AuthProvider";
+import RequireAuthState from "./components/RequireAuthState";
 function App() {
+  const { auth } = useContext(Context);
   return (
     <BrowserRouter>
       <Routes>
         <Route
-          path='/'
-          element={<Home />}
-        />
-        <Route
           path='/signup'
-          element={<Signup />}
+          element={auth?.token ? <Dashboard /> : <Signup />}
         />
         <Route
           path='/signin'
-          element={<Signin />}
+          element={auth?.token ? <Dashboard /> : <Signin />}
         />
         <Route
-          path='/dashboard'
-          element={<Dashboard />}
+          path='/'
+          element={<Home />}
         />
-        <Route
-          path='/send'
-          element={<Send />}
-        />
+        <Route element={<RequireAuthState />}>
+          <Route
+            path='/dashboard'
+            element={<Dashboard />}
+          />
+        </Route>
+        <Route element={<RequireAuthState />}>
+          <Route
+            path='/send'
+            element={<Send />}
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -1,27 +1,53 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Navbar } from "../components/Navbar";
+import Context from "../context/AuthProvider";
 
 export function Dashboard() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
+  const [balance, setbalance] = useState(0);
+  const [loading, setloading] = useState(true);
+  const { auth, setAuth } = useContext(Context);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get("http://localhost:7000/api/v1/user/bulk?filter=" + filter)
-      .then((response) => {
-        setUsers(response.data.user);
-      });
+      .get("/api/v1/account/balance", {
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+      })
+      .then((response) => setbalance(response.data.balance));
+    setloading(false);
+  }, []);
+
+  useEffect(() => {
+    axios.get("/api/v1/user/bulk?filter=" + filter).then((response) => {
+      setUsers(response.data.user);
+    });
   }, [filter]);
+
+  const handleDelete = () => {
+    setAuth({});
+    navigate("/signin");
+  };
 
   return (
     <div>
       <Navbar />
       <div className='m-8'>
-        <div className='flex'>
-          <div className='font-bold text-lg'>Your Balance</div>
-          <div className='font-semibold ml-4 text-lg'>Rs 10,000</div>
+        <div className='flex justify-between'>
+          <div className='font-bold text-lg'>
+            Your Balance: rs {balance.toFixed()}
+          </div>
+          <button
+            onClick={handleDelete}
+            className='text-white p-3 rounded-lg bg-red-700 hover:opacity-95'
+          >
+            logout
+          </button>
         </div>
         <div className='font-bold mt-6 text-lg'>Users</div>
         <div className='my-2'>

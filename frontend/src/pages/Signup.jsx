@@ -15,15 +15,12 @@ export function Signup() {
     e.preventDefault();
     setloading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:7000/api/v1/user/signup",
-        {
-          username: email,
-          firstName,
-          lastName,
-          password,
-        }
-      );
+      const response = await axios.post("/api/v1/user/signup", {
+        username: email,
+        firstName,
+        lastName,
+        password,
+      });
       // if (response.success === false) {
       //   setloading(false);
       //   setError("invalid inputs");

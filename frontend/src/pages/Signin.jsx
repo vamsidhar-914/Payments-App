@@ -1,23 +1,22 @@
 import axios from "axios";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, json, useNavigate } from "react-router-dom";
+import Context from "../context/AuthProvider";
 
 export function Signin() {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const navigate = useNavigate();
+  const { setAuth } = useContext(Context);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:7000/api/v1/user/signin",
-        {
-          username: email,
-          password,
-        }
-      );
-      localStorage.setItem("token", response.data.token);
+      const response = await axios.post("/api/v1/user/signin", {
+        username: email,
+        password,
+      });
+      setAuth(response.data);
       navigate("/dashboard");
     } catch (err) {
       console.log(err.message);
